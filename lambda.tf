@@ -1,3 +1,20 @@
+variable "lambda_function_filename" {
+  type = string
+}
+
+variable "lambda_function_name" {
+  type = string
+}
+
+variable "lambda_function_runtime" {
+  type = string
+}
+
+variable "lambda_function_handler" {
+  type = string
+}
+
+
 resource "aws_iam_role" "lambda_role" {
     name = "lambda-exec-role"
     assume_role_policy = <<EOF
@@ -18,14 +35,14 @@ EOF
 }
 
 resource "aws_lambda_function" "message_consumer_lambda" {
-  filename      = "lambda/test-function.zip"
-  function_name = "lamda-test-function"
+  filename      = var.lambda_function_filename
+  function_name = var.lambda_function_name
   role          = aws_iam_role.lambda_role.arn
-  handler       = "test-function.handler"
+  handler       = var.lambda_function_handler
 
-  source_code_hash = filebase64sha256("lambda/test-function.zip")
+  source_code_hash = filebase64sha256(var.lambda_function_filename)
 
-  runtime = "nodejs12.x"
+  runtime = var.lambda_function_runtime
 
   depends_on = [
     aws_iam_role_policy_attachment.lambda_logs
