@@ -1,24 +1,62 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 2.70"
-    }
-  }
-}
-
-provider "aws" {
-  profile = "default"
-  region  = "us-east-2"
-}
-
 resource "aws_sns_topic" "chat-message" {
   name = "chat-message-topic"
-  lambda_failure_feedback_role_arn = "arn:aws:iam::893740494595:role/SNSFailureFeedback" # TODO
+  lambda_failure_feedback_role_arn = aws_iam_role.sns_failure_logging.arn
 }
 
 resource "aws_sns_topic_subscription" "message_consumer_lambda_target" {
   topic_arn = aws_sns_topic.chat-message.arn
   protocol  = "lambda"
   endpoint  = aws_lambda_function.message_consumer_lambda.arn
+}
+
+# Create a role for failure logging, with associated policy that allows logging
+
+resource "aws_iam_role" "sns_failure_logging" {
+  name = "sns-failure-logging"
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "sns.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_policy" "sns_failure_logging" {
+  name = "sns-failure-logging"
+  path        = "/"
+  description = "IAM policy for failure logging an sns topic"
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:PutMetricFilter",
+                "logs:PutRetentionPolicy"
+            ],
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
+EOF  
+}
+
+resource "aws_iam_role_policy_attachment" "sns-failure-logging" {
+  role       = aws_iam_role.sns_failure_logging.name
+  policy_arn = aws_iam_policy.sns_failure_logging.arn
 }
