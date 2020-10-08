@@ -6,7 +6,7 @@ resource "aws_sns_topic" "chat-message" {
 resource "aws_sns_topic_subscription" "message_consumer_lambda_target" {
   topic_arn = aws_sns_topic.chat-message.arn
   protocol  = "lambda"
-  endpoint  = aws_lambda_function.message_consumer_lambda.arn
+  endpoint  = module.lambda_message_consumer.lambda.arn
 }
 
 # Create a role for failure logging, with associated policy that allows logging
