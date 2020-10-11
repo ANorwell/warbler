@@ -15,5 +15,5 @@ resource "aws_lambda_permission" "allow_sns" {
   action        = "lambda:InvokeFunction"
   function_name = module.lambda_message_consumer.lambda.function_name
   principal     = "sns.amazonaws.com"
-  source_arn    = aws_sns_topic.chat-message.arn
+  source_arn    = aws_sns_topic.chat_message.arn
 }
