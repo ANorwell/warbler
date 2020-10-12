@@ -16,13 +16,8 @@ variable "handler" {
 
 variable "iam_role" {
   type = object({
-    name = string
     arn = string
   })
-}
-
-variable "logging_policy_arn" {
-  type = string
 }
 
 output "lambda" {
@@ -37,11 +32,7 @@ resource "aws_lambda_function" "lambda" {
 
   source_code_hash = filebase64sha256(var.filename)
 
-  runtime = var.runtime
-
-  depends_on = [
-    aws_iam_role_policy_attachment.lambda_logs
-  ]  
+  runtime = var.runtime 
 }
 
 resource "aws_cloudwatch_log_group" "logging" {
@@ -49,7 +40,3 @@ resource "aws_cloudwatch_log_group" "logging" {
   retention_in_days = 14
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_logs" {
-  role       = var.iam_role.name
-  policy_arn = var.logging_policy_arn
-}

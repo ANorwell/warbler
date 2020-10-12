@@ -7,7 +7,6 @@ module "lambda_web" {
   runtime = "nodejs12.x"
 
   iam_role = aws_iam_role.lambda_role
-  logging_policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
 resource "aws_api_gateway_rest_api" "web_api" {
