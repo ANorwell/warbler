@@ -4,23 +4,36 @@ const AWS = require("aws-sdk");
 exports.handler = async function(event, context) {
   console.log('Received event:', JSON.stringify(event, null, 4));
 
-  await sendSns(event);
+  user = (event.headers['X-Forwarded-For'] || 'Unknown').split(",")[0];
+  let responseBody = `<p>User: ${user}</p>`;
+
+  if (event.httpMethod == 'POST') {
+    message = event.body;
+    await sendSns(user, message);
+    responseBody += `<p>Submitted ${message} for ${user}</p>`;
+  } else {
+    responseBody += `<p>Hello world</p>`;
+  }
 
   const response = {
     statusCode: 200,
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
     },
-    body: '<p>Hello world 22!</p>',
+    body: responseBody,
   }
   return response;
 };
 
-async function sendSns(anEvent, context) {
+async function sendSns(user, message) {
   const sns = new AWS.SNS();
+
   const params = {
-      Message: JSON.stringify(anEvent),
-      Subject: "Test SNS From Lambda",
+      Message: JSON.stringify({
+        user: user,
+        message: message
+      }),
+      Subject: "chat message",
       TopicArn: "arn:aws:sns:us-east-2:893740494595:chat-message-topic"
   };
   return sns.publish(params).promise();
