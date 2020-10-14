@@ -12,16 +12,16 @@ exports.handler = async function(event, context) {
         TableName: "Messages",
         Item: {
             "User": {
-                S: payload.user
+                S: payload.User
             },
             "Timestamp": {
-                N: payload.timestamp.toString()
+                N: payload.Timestamp.toString()
             },
             "Conversation": {
-                S: payload.conversation
+                S: payload.Conversation
             },
             "Message": {
-                S: payload.message
+                S: payload.Message
             }
         }
     }

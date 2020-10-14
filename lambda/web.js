@@ -4,20 +4,21 @@ const AWS = require("aws-sdk");
 exports.handler = async function(event, context) {
   console.log('Received event:', JSON.stringify(event, null, 4));
 
-  user = (event.headers['X-Forwarded-For'] || 'Unknown').split(",")[0];
   conversation = event.requestContext.path;
   let payload = {
-    user: user,
-    conversation: conversation,
-    timestamp: Date.now()
+    Conversation: conversation,
+    Timestamp: Date.now()
    };
 
   if (event.httpMethod == 'POST') {
-    payload.message = event.body;
+    body = JSON.parse(event.body);
+    user = (body.User || event.headers['X-Forwarded-For'] || 'Unknown').split(",")[0];
+    payload.Message = body.Message || '<no message>';
+    payload.User = user;
     await sendSns(payload);
-    payload.status = 'submitted';
+    payload.Status = 'submitted';
   } else {
-    payload.messages = await listMessages(conversation);
+    payload.Messages = await listMessages(conversation);
   }
 
   const response = {
@@ -61,8 +62,8 @@ async function listMessages(conversation) {
 
 function parseDynamoMessage(message) {
   return {
-    timestamp: parseInt(message['Timestamp']['N']),
-    user: message['User']['S'],
-    message: message['Message']['S']
+    Timestamp: parseInt(message['Timestamp']['N']),
+    User: message['User']['S'],
+    Message: message['Message']['S']
   }
 }
