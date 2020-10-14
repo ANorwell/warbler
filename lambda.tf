@@ -70,3 +70,31 @@ resource "aws_iam_role_policy_attachment" "lambda_sns_publishing" {
   role       = aws_iam_role.lambda_role.name
   policy_arn = aws_iam_policy.lambda_sns_publishing.arn
 }
+
+resource "aws_iam_policy" "lambda_dynamo_read_write" {
+  name        = "lambda_dynamo_read_write"
+  path        = "/"
+  description = "IAM policy for dynamo access from a lambda"
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "dynamodb:Scan",
+        "dynamodb:GetItem",
+        "dynamodb:PutItem"
+      ],
+      "Resource": "arn:aws:dynamodb:*:*:table/*",
+      "Effect": "Allow"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_dynamo" {
+  role       = aws_iam_role.lambda_role.name
+  policy_arn = aws_iam_policy.lambda_dynamo_read_write.arn
+}
