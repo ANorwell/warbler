@@ -1,6 +1,8 @@
 console.log("Loading function");
 const AWS = require("aws-sdk");
 
+const ORIGIN = 'http://warbler.s3-website.us-east-2.amazonaws.com';
+
 exports.handler = async function(event, context) {
   console.log('Received event:', JSON.stringify(event, null, 4));
 
@@ -25,6 +27,7 @@ exports.handler = async function(event, context) {
     statusCode: 200,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
+      'Access-Control-Allow-Origin': ORIGIN
     },
     body: JSON.stringify(payload),
   }
@@ -55,9 +58,8 @@ async function listMessages(conversation) {
   }
 
   let messages = await dynamo.scan(params).promise();
-  messages.Items = messages.Items.map(parseDynamoMessage);
 
-  return messages;
+  return messages.Items.map(parseDynamoMessage);
 }
 
 function parseDynamoMessage(message) {

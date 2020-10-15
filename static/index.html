@@ -1,0 +1,88 @@
+<html>
+  <template id="message-template">
+    <style>
+      .container { 
+        margin: 1em; 
+        font-family: "Open Sans Light",Helvetica,Arial
+      }
+      .author { font-size: 90%; font-weight: bold; }
+      .time { font-size: 60%; color: rgb(130, 130, 130) }
+      .message { margin-left: 0.5em; margin-top: 0.25em; color: rgb(77, 77, 77) }
+    </style>
+
+    <div class="container">
+      <div class="author">
+        <slot name="author">N/A</slot>
+      </div>
+      <div class="time">
+        <slot name="time">N/A</slot>
+      </div>
+      <div class="message">
+        <slot name="message">N/A</slot>
+      </div>
+    </div>
+  </template>
+
+  <div id="messages"></div>
+
+  <style>
+    .messages {
+      max-width: 600px;
+    }
+    .post {
+      margin-top: 2em;
+      font-family: "Open Sans Light",Helvetica,Arial; 
+      font-weight: bold;
+      max-width: 600px;
+    }
+    input {
+      margin: 5px;
+      width: 100%;
+      background: rgba(0,0,0,0.1);
+	    border: 1px solid rgba(0,0,0,0.3);
+      border-radius: 4px;
+      box-shadow: inset 0 -5px 45px rgba(100,100,100,0.2), 0 1px 1px rgba(255,255,255,0.2);
+      border: none;
+	    outline: none;
+	    padding: 0.5em;
+	    font-size: 13px;
+    }
+
+    input:focus { box-shadow: inset 0 -5px 45px rgba(100,100,100,0.4), 0 1px 1px rgba(255,255,255,0.2); }
+
+    .btn {
+      font-weight: bold;
+      background: #45a2e0;
+      background-image: -webkit-linear-gradient(top, #45a2e0, #226d9c);
+      background-image: -moz-linear-gradient(top, #45a2e0, #226d9c);
+      background-image: -ms-linear-gradient(top, #45a2e0, #226d9c);
+      background-image: -o-linear-gradient(top, #45a2e0, #226d9c);
+      background-image: linear-gradient(to bottom, #45a2e0, #226d9c);
+      border-radius: 0.6em;
+      color: #ffffff;
+      font-size: 1.2em;
+      padding: 0.5em 1em 0.5em 1em;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: #2e89c2;
+      background-image: -webkit-linear-gradient(top, #2e89c2, #215d85);
+      background-image: -moz-linear-gradient(top, #2e89c2, #215d85);
+      background-image: -ms-linear-gradient(top, #2e89c2, #215d85);
+      background-image: -o-linear-gradient(top, #2e89c2, #215d85);
+      background-image: linear-gradient(to bottom, #2e89c2, #215d85);
+      text-decoration: none;
+    }   
+  </style>
+
+  <div class='post'>
+    <form id="submit-post">
+      <input type="text" name="User" placeholder="Name"/>
+      <input type="text" name="Message" placeholder="Message"/>
+      <button class="btn" type="submit">Post</button>
+    </form>
+  </div>
+
+  <script type="text/javascript" src="./messages.js"></script>
+</html>
