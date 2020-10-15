@@ -2,6 +2,8 @@
 const topic = (new URLSearchParams(window.location.search)).get('topic') || 'chat';
 const baseUrl = `https://3nxef8f9d7.execute-api.us-east-2.amazonaws.com/test/${topic}`;
 
+let mostRecentMessageTimestamp = 0;
+
 // based closely on https://stackoverflow.com/questions/30008114/how-do-i-promisify-native-xhr
 function makeRequest(method, url, bodyObject = null) {
   return new Promise(function (resolve, reject) {
@@ -40,6 +42,8 @@ async function loadMessages() {
   const messages = await getMessages();
   document.getElementById('messages').innerHTML = '';
   messages.forEach(message => renderMessage(message));
+  mostRecentMessageTimestamp = messages[0] ? messages[messages.length - 1].Timestamp : 0;
+  return messages;
 }
 
 customElements.define('message-item',
@@ -90,11 +94,17 @@ async function submitPost(e) {
     Message: form.Message.value
   };
 
+  form.reset();
+
   let result = await makeRequest('POST', baseUrl, payload);
   console.log('Submitted message: ', payload);
-  
-  await delay(100); // allow time for the message to be readable
-  await loadMessages();
+
+  // poll until the new message is visible
+  let previousMostRecentMessage = mostRecentMessageTimestamp;
+  while (mostRecentMessageTimestamp <= previousMostRecentMessage) {
+    await delay(50);
+    await loadMessages();
+  }
   return result;
 }
 
@@ -114,8 +124,6 @@ function colorize(user) {
     hash |= 0; // Convert to 32bit integer
   }
   return colors[Math.abs(hash) % colors.length];  
-
-
 }
 
 document.getElementById('submit-post').onsubmit = submitPost;
